@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共享剪切板 · 点对点传输</title>
+
+    <style>
+        :root {
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --text: #2c3e50;
+            --muted: #6a7e8e;
+            --border: #e5e9f0;
+            --primary: #3b6e9e;
+            --danger: #b3424a;
+            --radius: 14px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            padding: 6px;
+        }
+
+        .container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto 1fr auto auto;
+            gap: 6px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+        }
+
+        .log-card {
+            grid-column: 1 / -1;
+        }
+
+        .footer {
+            grid-column: 1 / -1;
+        }
+
+        .my-id {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .peer-id {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .text-card {
+            grid-column: 1;
+            grid-row: 3;
+        }
+
+        .file-card {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: none;
+            }
+
+            .my-id,
+            .peer-id,
+            .text-card,
+            .file-card {
+                grid-column: auto;
+                grid-row: auto;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .card-title {
+            white-space: nowrap;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--muted);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            font-size: 0.9rem;
+            background: #fafafa;
+        }
+
+        input[type="file"] {
+            color: transparent;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        button.primary {
+            font-weight: 600;
+        }
+
+        button.danger {
+            color: var(--danger);
+        }
+
+        .file-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f9fafb;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .log-box {
+            flex: 1;
+            background: #f1f3f6;
+            border-radius: var(--radius-sm);
+            padding: 5px;
+            font-family: ui-monospace, monospace;
+            font-size: 0.75rem;
+            overflow-y: auto;
+            max-height: 5vh
+        }
+
+        .header,
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .footer {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="header">
+            <div>
+                <h1>📋 共享剪切板</h1>
+                <div style="font-size:0.85rem;color:#475569;">
+                    WebRTC P2P · 端到端加密 · 实时同步
+                </div>
+            </div>
+            <a href="https://github.com/E5C8F" target="_blank">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+            </a>
+        </div>
+
+        <div class="card my-id">
+            <div style="display:flex;gap:8px;align-items:center;">
+                <span class="card-title">🔑 我的标识</span>
+                <input id="我的标识" placeholder="自动生成或手动输入">
+            </div>
+            <div class="button-group">
+                <button id="申请" class="primary">📡 申请</button>
+                <button id="复制">📄 复制</button>
+                <button id="注销" class="danger">🚪 注销</button>
+            </div>
+            <div id="我的标识列表"></div>
+        </div>
+
+        <div class="card peer-id">
+            <div style="display:flex;gap:8px;align-items:center;">
+                <span class="card-title">🎯 目标标识</span>
+                <input id="目标标识" placeholder="粘贴对方标识">
+            </div>
+            <div class="button-group">
+                <button id="粘贴">📋 粘贴</button>
+                <button id="连接" class="primary">🔗 连接</button>
+                <button id="断开" class="danger">⛓️‍💥 断开</button>
+            </div>
+            <div id="目标标识列表"></div>
+        </div>
+
+        <div class="card text-card">
+            <div class="card-title">📝 共享文本</div>
+            <textarea id="共享文本区" placeholder="输入文本，自动同步给对方…"></textarea>
+        </div>
+
+        <div class="card file-card">
+            <div class="card-title">📁 共享文件</div>
+            <input type="file" id="选择文件" multiple>
+
+            <div id="文件列表区" class="file-list"></div>
+        </div>
+
+        <div class="card log-card">
+            <div class="card-title">📜 事件日志</div>
+            <div id="日志" class="log-box">提示：未连接目标时功能受限<br></div>
+        </div>
+
+        <div class="footer">
+            <span>🔒 WebRTC P2P · 数据端到端直传</span>
+            <span>不经过任何服务器</span>
+        </div>
+
+    </div>
+
+    <script src="./剪切板.js" defer></script>
+</body>
+
+</html>
