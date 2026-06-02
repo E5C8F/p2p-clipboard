@@ -372,10 +372,15 @@ async function 框架加载出错() {
 
 
 Promise.all([
-    import('https://esm.sh/peerjs@1.5.5'),
-    import('https://esm.sh/@noble/hashes@2.2.0/sha2'),
+    // import('https://esm.sh/peerjs@1.5.5'),
+    // import('https://esm.sh/@noble/hashes@2.2.0/sha2'),
     // import('https://cdn.jsdelivr.net/npm/@noble/ed25519@3.1.0/index.min.js'),
-    import('https://esm.sh/@noble/hashes@2.2.0/utils'),
+    // import('https://esm.sh/@noble/hashes@2.2.0/utils'),
+    import('https://esm.sh/peerjs@1.5.5').catch(() => import('https://fastly.jsdelivr.net/npm/peerjs@1.5.5/dist/bundler.mjs/+esm')),
+    import('https://esm.sh/@noble/hashes@2.2.0/sha2').catch(() => import('https://fastly.jsdelivr.net/npm/@noble/hashes@2.2.0/sha2.js/+esm')),
+    import('https://esm.sh/@noble/hashes@2.2.0/utils').catch(() => import('https://fastly.jsdelivr.net/npm/@noble/hashes@2.2.0/utils.js/+esm')),
+
+
 ]).then(([peerjs, sha2, utils]) => {
     Peer = peerjs.default;
     sha256 = sha2.sha256;
